@@ -13,56 +13,60 @@ public class LRUReplacer implements PageReplacer {
         this.maxSize = numPages;
     }
 
+    @Override
     public int Victim() {
-        // If LRUList is empty, no evictable frames
         if (LRUList.isEmpty()) {
             return -1;
         }
-        // The least recently used frame is at the tail (end) of the list
+        // Evict the least recently used frame from the tail
         int victimFrameId = LRUList.removeLast();
         LRUHash.remove(victimFrameId);
         return victimFrameId;
     }
 
+    @Override
     public void Pin(int frameId) {
-        // Check if we've reached capacity
-        if (size() >= maxSize && !pinnedFrames.contains(frameId) && !LRUHash.contains(frameId)) {
-            throw new RuntimeException("REPLACER IS FULL");
+        // Case 1: Already pinned, do nothing
+        if (pinnedFrames.contains(frameId)) {
+            return;
         }
 
-        // Case 1: Frame is currently in LRUList (evictable)
+        // Case 2: In the evictable list, move it to pinned
         if (LRUHash.contains(frameId)) {
-            // Remove it from LRUList and LRUHash
             LRUList.removeFirstOccurrence(frameId);
             LRUHash.remove(frameId);
+            pinnedFrames.add(frameId);
+            return;
         }
-        // Case 2: Frame is NOT in LRUHash (either already pinned or new)
-        // In either case, add to pinnedFrames
+
+        // Case 3: Completely new frame, check total storage capacity
+        if (size() >= maxSize) {
+            throw new RuntimeException("REPLACER IS FULL");
+        }
         pinnedFrames.add(frameId);
     }
 
-
+    @Override
     public void Unpin(int frameId) {
-        // If frame is already in LRUHash, do nothing (already evictable)
+        // If it's already unpinned/evictable, your test expects it to throw an exception or ignore
         if (LRUHash.contains(frameId)) {
-            return;
+            throw new RuntimeException("UNPIN PAGE NOT FOUND");
         }
 
-        // If frame is in pinnedFrames, remove it from pinnedFrames
-        if (pinnedFrames.contains(frameId)) {
-            pinnedFrames.remove(frameId);
-            // Add it back to LRU structure (as most recently used)
-            LRUList.addFirst(frameId);  // Add to head = most recent
-            LRUHash.add(frameId);
-            return;
+        // Must be in pinned set to be eligible for unpinning
+        if (!pinnedFrames.contains(frameId)) {
+            throw new RuntimeException("UNPIN PAGE NOT FOUND");
         }
 
-        // Frame not found in either data structure
-        throw new RuntimeException("UNPIN PAGE NOT FOUND");
+        pinnedFrames.remove(frameId);
+        // Add to head as most recently used evictable page
+        LRUList.addFirst(frameId);
+        LRUHash.add(frameId);
     }
 
-
+    @Override
     public int size() {
+        // Returns the total number of frames currently tracked by the replacer
         return LRUList.size() + pinnedFrames.size();
     }
 }
