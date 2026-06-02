@@ -4,7 +4,7 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.sustech.cs307.logicalOperator.ddl.DescribeTableExecutor;
+import edu.sustech.cs307.logicalOperator.ddl.*;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.JSqlParser;
@@ -20,9 +20,6 @@ import net.sf.jsqlparser.statement.create.table.CreateTable;
 import edu.sustech.cs307.exception.ExceptionTypes;
 import edu.sustech.cs307.logicalOperator.*;
 import edu.sustech.cs307.system.DBManager;
-import edu.sustech.cs307.logicalOperator.ddl.CreateTableExecutor;
-import edu.sustech.cs307.logicalOperator.ddl.ExplainExecutor;
-import edu.sustech.cs307.logicalOperator.ddl.ShowDatabaseExecutor;
 import edu.sustech.cs307.exception.DBException;
 
 public class LogicalPlanner {
@@ -57,6 +54,22 @@ public class LogicalPlanner {
             // Instantiate and run our new executor class
             DescribeTableExecutor describeExecutor = new DescribeTableExecutor(targetTable, dbManager.getMetaManager());
             describeExecutor.execute();
+            return null;
+        }
+        if (normalized.toLowerCase().startsWith("drop table ")) {
+            // Extract the table name text following the space
+            String targetTable = normalized.substring(11).trim();
+
+            // Instantiate and run our new Drop executor
+            DropTableExecutor dropExecutor = new DropTableExecutor(
+                    targetTable,
+                    dbManager.getMetaManager(),
+                    dbManager.getMetaManager().getTableNames().isEmpty() ? "CS307-DB" : "CS307-DB"
+            );
+            // Note: double check if dbManager has a direct getter for ROOT_DIR,
+            // if not, "CS307-DB" is your default relative root path string.
+
+            dropExecutor.execute();
             return null;
         }
         /// //////

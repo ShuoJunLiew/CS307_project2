@@ -13,6 +13,7 @@ edu\sustech\cs307\logicalOperator\LogicalFilterOperator.class
 edu\sustech\cs307\value\ValueType.class
 edu\sustech\cs307\meta\TableMeta.class
 edu\sustech\cs307\tuple\JoinTuple.class
+edu\sustech\cs307\logicalOperator\ddl\DropTableExecutor.class
 edu\sustech\cs307\storage\replacer\ClockReplacer.class
 edu\sustech\cs307\record\BitMap.class
 edu\sustech\cs307\record\RecordFileHandle.class
