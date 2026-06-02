@@ -29,6 +29,7 @@ edu\sustech\cs307\exception\DBException.class
 edu\sustech\cs307\optimizer\LogicalPlanner.class
 edu\sustech\cs307\value\Value$1.class
 edu\sustech\cs307\logicalOperator\LogicalTableScanOperator.class
+edu\sustech\cs307\logicalOperator\ddl\DescribeTableExecutor.class
 edu\sustech\cs307\record\RecordPageHeader.class
 edu\sustech\cs307\physicalOperator\SeqScanOperator.class
 edu\sustech\cs307\storage\PagePosition.class

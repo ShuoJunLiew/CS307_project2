@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.sustech.cs307.logicalOperator.ddl.DescribeTableExecutor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.JSqlParser;
@@ -47,6 +48,15 @@ public class LogicalPlanner {
 
             ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(dummyStmt, dbManager.getMetaManager());
             showDatabaseExecutor.execute();
+            return null;
+        }
+        if (normalized.toLowerCase().startsWith("describe ")) {
+            // Extract everything after the word "describe " as the table name target
+            String targetTable = normalized.substring(9).trim();
+
+            // Instantiate and run our new executor class
+            DescribeTableExecutor describeExecutor = new DescribeTableExecutor(targetTable, dbManager.getMetaManager());
+            describeExecutor.execute();
             return null;
         }
         /// //////

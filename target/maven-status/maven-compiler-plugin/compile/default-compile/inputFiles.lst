@@ -4,6 +4,7 @@ C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\index\Index.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\index\InMemoryOrderedIndex.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\CreateTableExecutor.java
+C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\DescribeTableExecutor.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\DMLExecutor.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\ExplainExecutor.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\ShowDatabaseExecutor.java
