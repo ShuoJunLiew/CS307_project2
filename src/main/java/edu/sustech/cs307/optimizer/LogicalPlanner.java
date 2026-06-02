@@ -37,6 +37,19 @@ public class LogicalPlanner {
         if (handleManualTransactionCommand(dbManager, sql)) {
             return null;
         }
+
+        /// //////
+        String normalized = normalizeSql(sql);
+        if (normalized.equalsIgnoreCase("SHOW TABLES")) {
+            // Create a dummy or empty ShowStatement if needed, or pass null since we match manually
+            net.sf.jsqlparser.statement.ShowStatement dummyStmt = new net.sf.jsqlparser.statement.ShowStatement();
+            dummyStmt.setName("TABLES");
+
+            ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(dummyStmt, dbManager.getMetaManager());
+            showDatabaseExecutor.execute();
+            return null;
+        }
+        /// //////
         JSqlParser parser = new CCJSqlParserManager();
         Statement stmt = null;
         try {
@@ -67,7 +80,7 @@ public class LogicalPlanner {
             explainExecutor.execute();
             return null;
         } else if (stmt instanceof ShowStatement showStatement) {
-            ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(showStatement);
+            ShowDatabaseExecutor showDatabaseExecutor = new ShowDatabaseExecutor(showStatement,dbManager.getMetaManager());
             showDatabaseExecutor.execute();
             return null;
         } else {
