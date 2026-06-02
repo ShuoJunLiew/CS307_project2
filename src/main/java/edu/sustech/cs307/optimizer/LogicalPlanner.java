@@ -152,10 +152,24 @@ public class LogicalPlanner {
             }
         }
 
-        // 在 Join 之后应用 Filter，Filter 的输入是 Join 的结果 (root)
+        // Apply filtering after joins
         if (plainSelect.getWhere() != null) {
             root = new LogicalFilterOperator(root, plainSelect.getWhere());
         }
+        /// //////
+        // --- AGGREGATION DETECTOR INTERCEPTOR ---
+        if (plainSelect.getSelectItems() != null && !plainSelect.getSelectItems().isEmpty()) {
+            var firstItem = plainSelect.getSelectItems().get(0).getExpression();
+            if (firstItem instanceof net.sf.jsqlparser.expression.Function function) {
+                if (function.getName().equalsIgnoreCase("COUNT")) {
+                    // It's a COUNT query! Wrap our plan in a LogicalAggregationOperator container
+                    return new LogicalAggregationOperator(root, function.toString());
+                }
+            }
+        }
+        /// //////
+
+        // Baseline Projection for standard columns
         root = new LogicalProjectOperator(root, plainSelect.getSelectItems());
         return root;
     }

@@ -9,6 +9,7 @@ C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\DropTableExecutor.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\ExplainExecutor.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\ddl\ShowDatabaseExecutor.java
+C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\LogicalAggregationOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\LogicalDeleteOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\LogicalFilterOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\logicalOperator\LogicalInsertOperator.java
@@ -23,6 +24,7 @@ C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\meta\TableMeta.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\optimizer\LogicalPlanner.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\optimizer\PhysicalPlanner.java
+C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\physicalOperator\CountOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\physicalOperator\DeleteOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\physicalOperator\FilterOperator.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\physicalOperator\IndexScanOperator.java
@@ -50,6 +52,7 @@ C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\system\DBManager.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\system\RecordManager.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\system\TransactionManager.java
+C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\tuple\AggregationTuple.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\tuple\JoinTuple.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\tuple\ProjectTuple.java
 C:\Users\LIEW BO XIANN\Documents\CS307_project2\src\main\java\edu\sustech\cs307\tuple\TableTuple.java
