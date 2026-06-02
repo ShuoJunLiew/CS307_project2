@@ -66,4 +66,14 @@ public class CountOperator implements PhysicalOperator {
         schema.add(new ColumnMeta("AGGREGATE", outputFieldName, ValueType.INTEGER, 8, 0));
         return schema;
     }
+
+    @Override
+    public String explain(String indent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent).append("-> Aggregation(COUNT(\"").append(this.outputFieldName).append("\"))\n");
+        if (this.child != null) {
+            sb.append(this.child.explain(indent + "   "));
+        }
+        return sb.toString();
+    }
 }

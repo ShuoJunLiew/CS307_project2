@@ -18,4 +18,13 @@ public interface PhysicalOperator {
     void Close();
 
     ArrayList<ColumnMeta> outputSchema();
+
+    /**
+     * Recursively prints the execution plan tree.
+     * @param indent The current indentation string (e.g., "  ")
+     * @return A formatted string showing this operator and its children
+     */
+    default String explain(String indent) {
+        return indent + this.getClass().getSimpleName() + "\n";
+    }
 }

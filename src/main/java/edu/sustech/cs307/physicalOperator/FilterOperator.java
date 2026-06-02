@@ -120,4 +120,18 @@ public class FilterOperator implements PhysicalOperator {
     public ArrayList<ColumnMeta> outputSchema() {
         return child.outputSchema();
     }
+
+    /// /////
+    @Override
+    public String explain(String indent) {StringBuilder sb = new StringBuilder();
+        sb.append(indent).append("LogicalFilterOperator(condition=").append(this.whereExpr.toString()).append(")\n");
+
+        if (this.child != null) {
+            // Pass down the tree line symbol for the leaf node
+            sb.append(this.child.explain(indent));
+        }
+        return sb.toString();
+    }
+    /// /////
+
 }
