@@ -24,14 +24,26 @@ public abstract class Tuple {
 
     private boolean evaluateCondition(Tuple tuple, Expression whereExpr) {
         //todo: add Or condition
+        // 1. Handle Logical AND (Both sides must be true)
         if (whereExpr instanceof AndExpression andExpr) {
-            // Recursively evaluate left and right expressions
             return evaluateCondition(tuple, andExpr.getLeftExpression())
                     && evaluateCondition(tuple, andExpr.getRightExpression());
-        } else if (whereExpr instanceof BinaryExpression binaryExpression) {
+        }
+
+        // 2. Handle Logical OR (At least one side must be true)
+        else if (whereExpr instanceof OrExpression orExpr) {
+            return evaluateCondition(tuple, orExpr.getLeftExpression())
+                    || evaluateCondition(tuple, orExpr.getRightExpression());
+        }
+
+        // 3. Base Case: Leaf nodes are standard comparisons (e.g., age >= 20)
+        else if (whereExpr instanceof BinaryExpression binaryExpression) {
             return evaluateBinaryExpression(tuple, binaryExpression);
-        } else {
-            return true; // For non-binary and non-AND expressions, just return true for now
+        }
+
+        // 4. Fallback default
+        else {
+            return true;
         }
     }
 
@@ -79,6 +91,18 @@ public abstract class Tuple {
                 return comparisonResult == 0;
             }
             // todo: finish condition > < >= <=
+            // Task 1.2: Support all required range and equality operator strings
+            else if (operator.equals(">")) {
+                return comparisonResult > 0;
+            } else if (operator.equals("<")) {
+                return comparisonResult < 0;
+            } else if (operator.equals(">=")) {
+                return comparisonResult >= 0;
+            } else if (operator.equals("<=")) {
+                return comparisonResult <= 0;
+            } else if (operator.equals("!=")) {
+                return comparisonResult != 0;
+            }
 
         } catch (DBException e) {
             e.printStackTrace(); // Handle exception properly

@@ -32,7 +32,16 @@ public class LogicalProjectOperator extends LogicalOperator {
             //todo : add selectItem.getExpression() instance of Column
             if (selectItem.getExpression() instanceof AllColumns column) {
                 outputSchema.add(new TabCol("*", "*"));
-            } else {
+            }
+            /// ////////
+            else if (selectItem.getExpression() instanceof Column column) {
+                String colName = column.getColumnName();
+                // If there's a table prefix (like 't' in 't.id'), extract it; otherwise default to empty or "*"
+                String tableName = (column.getTable() != null) ? column.getTable().getName() : "*";
+                outputSchema.add(new TabCol(tableName, colName));
+            }
+            /// ////////
+            else {
                 throw new DBException(ExceptionTypes.NotSupportedOperation(selectItem.getExpression()));
             }
         }

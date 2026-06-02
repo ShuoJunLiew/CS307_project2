@@ -29,12 +29,21 @@ public class ProjectTuple extends Tuple {
      */
     @Override
     public Value getValue(TabCol tabCol) throws DBException {
+        // 1. Loop through our projection list to find the column the user requested
         for (TabCol projectColumn : schema) {
-            if (projectColumn.equals(tabCol)) {
-                return inputTuple.getValue(tabCol); // Get value from input tuple
+            if (projectColumn.getColumnName().equalsIgnoreCase(tabCol.getColumnName())) {
+
+                // 2. Scan the child's native schema to find its true storage key descriptor
+                for (TabCol childCol : inputTuple.getTupleSchema()) {
+                    if (childCol.getColumnName().equalsIgnoreCase(tabCol.getColumnName())) {
+
+                        // 3. Fetch using the child's real key (e.g., TabCol("t", "name"))
+                        return inputTuple.getValue(childCol);
+                    }
+                }
             }
         }
-        return null; // Column not in projection list
+        return null;
     }
 
     /**

@@ -19,6 +19,7 @@ edu\sustech\cs307\record\BitMap.class
 edu\sustech\cs307\record\RecordFileHandle.class
 edu\sustech\cs307\storage\replacer\LRUReplacer.class
 edu\sustech\cs307\logicalOperator\ddl\ExplainExecutor.class
+edu\sustech\cs307\logicalOperator\LogicalDeleteOperator.class
 edu\sustech\cs307\logicalOperator\LogicalProjectOperator.class
 edu\sustech\cs307\tuple\Tuple.class
 edu\sustech\cs307\meta\TableMeta$IndexType.class
@@ -54,6 +55,7 @@ edu\sustech\cs307\tuple\TempTuple.class
 edu\sustech\cs307\system\DBManager.class
 edu\sustech\cs307\optimizer\PhysicalPlanner.class
 edu\sustech\cs307\physicalOperator\UpdateOperator.class
+edu\sustech\cs307\physicalOperator\DeleteOperator.class
 edu\sustech\cs307\physicalOperator\InMemoryIndexScanOperator.class
 edu\sustech\cs307\meta\MetaManager.class
 edu\sustech\cs307\value\Value.class

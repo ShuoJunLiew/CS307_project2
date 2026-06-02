@@ -94,6 +94,10 @@ public class LogicalPlanner {
         }
         //todo: add condition of handleDelete
         // functional
+        // Handle physical data deletions via our new DML logic
+        else if (stmt instanceof net.sf.jsqlparser.statement.delete.Delete deleteStmt) {
+            operator = handleDelete(dbManager, deleteStmt);
+        }
         else if (stmt instanceof CreateTable createTableStmt) {
             CreateTableExecutor createTable = new CreateTableExecutor(createTableStmt, dbManager, sql);
             createTable.execute();
@@ -110,6 +114,22 @@ public class LogicalPlanner {
             throw new DBException(ExceptionTypes.UnsupportedCommand((stmt.toString())));
         }
         return operator;
+    }
+
+    // handle delete method
+    private static LogicalOperator handleDelete(DBManager dbManager, net.sf.jsqlparser.statement.delete.Delete deleteStmt) throws DBException {
+        String tableName = deleteStmt.getTable().getName();
+
+        // 1. Start with a baseline scan operator to traverse the physical file pages
+        LogicalOperator root = new LogicalTableScanOperator(tableName, dbManager);
+
+        // 2. If a WHERE predicate clause exists, interject a Filter operator into the tree stream
+        if (deleteStmt.getWhere() != null) {
+            root = new LogicalFilterOperator(root, deleteStmt.getWhere());
+        }
+
+        // 3. Return the mutation wrapper to pass to the physical execution engine planner
+        return new LogicalDeleteOperator(tableName, root);
     }
 
 

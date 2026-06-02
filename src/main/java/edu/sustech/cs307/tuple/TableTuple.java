@@ -14,6 +14,7 @@ import edu.sustech.cs307.exception.ExceptionTypes;
 import edu.sustech.cs307.meta.ColumnMeta;
 
 import io.netty.buffer.ByteBuf;
+import edu.sustech.cs307.record.RID;
 
 public class TableTuple extends Tuple {
     private final String tableName;
