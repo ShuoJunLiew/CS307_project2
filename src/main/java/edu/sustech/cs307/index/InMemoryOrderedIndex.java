@@ -12,26 +12,62 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class InMemoryOrderedIndex implements Index {
 
     private TreeMap<Value, RID> indexMap;
 
     public InMemoryOrderedIndex(String persistPath) {
-        // read from persistPath
+        this.indexMap = new TreeMap<>((v1, v2) -> {
+            try {
+                return edu.sustech.cs307.value.ValueComparer.compare(v1, v2);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         try {
             File file = new File(persistPath);
             if (file.exists()) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                TypeReference<TreeMap<Value, RID>> typeRef = new TypeReference<>() {
-                };
-                this.indexMap = new TreeMap<>(objectMapper.readValue(file, typeRef));
+                // Read as raw Map<String, Map> then convert to Value keys
+                TypeReference<Map<String, RID>> typeRef = new TypeReference<>() {};
+                Map<String, RID> loaded = objectMapper.readValue(file, typeRef);
+                if (loaded != null) {
+                    for (Map.Entry<String, RID> entry : loaded.entrySet()) {
+                        Value key = parseKey(entry.getKey());
+                        if (key != null) {
+                            this.indexMap.put(key, entry.getValue());
+                        }
+                    }
+                }
             }
         } catch (IOException e) {
             Logger.error("Error loading index data: " + e.getMessage());
         }
+    }
+
+    /**
+     * Parse a string key back to a Value object.
+     * The key format is the Java toString representation of the value.
+     */
+    private Value parseKey(String keyStr) {
+        if (keyStr == null) return null;
+        // Try parsing as Long (INTEGER)
+        try {
+            long longVal = Long.parseLong(keyStr);
+            return new Value(longVal);
+        } catch (NumberFormatException ignored) {}
+        // Try parsing as Double (FLOAT)
+        try {
+            double doubleVal = Double.parseDouble(keyStr);
+            return new Value(doubleVal);
+        } catch (NumberFormatException ignored) {}
+        // Default to CHAR
+        return new Value(keyStr);
     }
 
     @Override
@@ -85,5 +121,12 @@ public class InMemoryOrderedIndex implements Index {
                 high, rightEqual);
 
         return subMap.entrySet().iterator();
+    }
+
+    /**
+     * Returns an iterator over all entries in the index, sorted by key.
+     */
+    public Iterator<Entry<Value, RID>> getAllEntries() {
+        return indexMap.entrySet().iterator();
     }
 }

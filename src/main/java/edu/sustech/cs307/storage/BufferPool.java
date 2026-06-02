@@ -215,6 +215,20 @@ public class BufferPool {
     }
 
     /**
+     * Clear all cached pages from the buffer pool without flushing.
+     * Used after restoring a transaction snapshot to invalidate stale cache.
+     */
+    public void ClearAllPages() {
+        pages.clear();
+        pageMap.clear();
+        freeList.clear();
+        for (int i = 0; i < poolSize; i++) {
+            pages.add(new Page());
+            freeList.add(i);
+        }
+    }
+
+    /**
      * 删除指定文件名的所有页面。
      *
      * @param filename 要删除页面的文件名

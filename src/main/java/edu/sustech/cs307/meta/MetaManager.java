@@ -67,6 +67,36 @@ public class MetaManager {
         // return null;
     }
 
+    public void addIndex(String tableName, String columnName) throws DBException {
+        TableMeta tableMeta = getTable(tableName);
+        if (tableMeta.getIndexes() == null) {
+            tableMeta.setIndexes(new HashMap<>());
+        }
+        String indexKey = columnName;
+        if (tableMeta.getIndexes().containsKey(indexKey)) {
+            throw new DBException(ExceptionTypes.IndexAlreadyExist(tableName, columnName));
+        }
+        tableMeta.getIndexes().put(indexKey, TableMeta.IndexType.BTREE);
+        saveToJson();
+    }
+
+    public void dropIndex(String tableName, String columnName) throws DBException {
+        TableMeta tableMeta = getTable(tableName);
+        if (tableMeta.getIndexes() == null || !tableMeta.getIndexes().containsKey(columnName)) {
+            throw new DBException(ExceptionTypes.IndexDoesNotExist(tableName, columnName));
+        }
+        tableMeta.getIndexes().remove(columnName);
+        saveToJson();
+    }
+
+    /**
+     * Reload metadata from JSON file, discarding in-memory state.
+     */
+    public void reload() throws DBException {
+        this.tables.clear();
+        loadFromJson();
+    }
+
     public Set<String> getTableNames() {
         return this.tables.keySet();
     }

@@ -1,5 +1,8 @@
 package edu.sustech.cs307.value;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.nio.ByteBuffer;
 
 public class Value {
@@ -9,7 +12,8 @@ public class Value {
     public static final int FLOAT_SIZE = 8;
     public static final int CHAR_SIZE = 64;
 
-    public Value(Object value, ValueType type) {
+    @JsonCreator
+    public Value(@JsonProperty("value") Object value, @JsonProperty("type") ValueType type) {
         this.value = value;
         this.type = type;
     }
@@ -91,15 +95,11 @@ public class Value {
     @Override
     public String toString() {
         switch (type) {
-            case INTEGER, FLOAT ->{
+            case INTEGER, FLOAT -> {
                 return this.value.toString();
             }
             case CHAR -> {
-                byte[] bytes = ((String) this.value).getBytes();
-                ByteBuffer buffer3 = ByteBuffer.wrap(bytes);
-                var length = buffer3.getInt();
-                // int is 4 byte
-                return new String(bytes, 4, length);
+                return this.value.toString();
             }
             default -> throw new RuntimeException("Unsupported value type: " + type);
         }
