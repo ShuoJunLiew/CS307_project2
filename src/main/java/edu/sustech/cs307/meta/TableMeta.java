@@ -97,4 +97,21 @@ public class TableMeta {
     public void setIndexes(Map<String, IndexType> indexes) {
         this.indexes = indexes;
     }
+
+    public void addIndex(String columnName, IndexType type) {
+        if (this.indexes == null) {
+            this.indexes = new HashMap<>();
+        }
+        this.indexes.put(columnName, type);
+    }
+
+    public void dropIndex(String columnName) {
+        if (this.indexes != null) {
+            this.indexes.remove(columnName);
+        }
+    }
+
+    public boolean hasIndex(String columnName) {
+        return this.indexes != null && this.indexes.containsKey(columnName);
+    }
 }

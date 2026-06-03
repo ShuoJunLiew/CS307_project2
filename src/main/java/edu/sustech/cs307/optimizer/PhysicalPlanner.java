@@ -26,6 +26,8 @@ public class PhysicalPlanner {
     public static PhysicalOperator generateOperator(DBManager dbManager, LogicalOperator logicalOp) throws DBException {
         if (logicalOp instanceof LogicalTableScanOperator tableScanOperator) {
             return handleTableScan(dbManager, tableScanOperator);
+        } else if (logicalOp instanceof LogicalIndexScanOperator indexScanOperator) {
+            return handleIndexScan(dbManager, indexScanOperator);
         } else if (logicalOp instanceof LogicalFilterOperator filterOperator) {
             return handleFilter(dbManager, filterOperator);
         } else if (logicalOp instanceof LogicalJoinOperator joinOperator) {
@@ -39,9 +41,10 @@ public class PhysicalPlanner {
             /// /////
         } else if (logicalOp instanceof LogicalDeleteOperator deleteOperator) {
             return handleDelete(dbManager, deleteOperator);
-        } /// /////
-        else if (logicalOp instanceof LogicalAggregationOperator aggOperator) {
-            return handleAggregation(dbManager, aggOperator);
+        } else if (logicalOp instanceof LogicalAggregateOperator aggregateOperator) {
+            return handleAggregate(dbManager, aggregateOperator);
+        } else if (logicalOp instanceof LogicalSortOperator sortOperator) {
+            return handleSort(dbManager, sortOperator);
         }
           /// /////
         else {
@@ -55,17 +58,38 @@ public class PhysicalPlanner {
         try {
             tableMeta = dbManager.getMetaManager().getTable(tableName);
         } catch (DBException e) {
-            // Fallback to SeqScan if TableMeta cannot be retrieved
             return new SeqScanOperator(tableName, dbManager);
         }
 
-        // Check if index exists for the table (for now, assume RBTreeIndex always
-        // exists if index is defined)
         if (tableMeta.getIndexes() != null && !tableMeta.getIndexes().isEmpty()) {
-            throw new RuntimeException("unimplement");
+            // Use index scan: pick the first indexed column
+            String indexedColumn = tableMeta.getIndexes().keySet().iterator().next();
+            String indexDir = dbManager.getDiskManager().getCurrentDir() + "/" + tableName;
+            String indexFile = indexDir + "/index_" + indexedColumn + ".json";
+            return new InMemoryIndexScanOperator(
+                    new edu.sustech.cs307.index.InMemoryOrderedIndex(indexFile),
+                    tableName, dbManager);
         } else {
             return new SeqScanOperator(tableName, dbManager);
         }
+    }
+
+    private static PhysicalOperator handleIndexScan(DBManager dbManager, LogicalIndexScanOperator logicalIndexScanOp) {
+        String tableName = logicalIndexScanOp.getTableName();
+        try {
+            TableMeta tableMeta = dbManager.getMetaManager().getTable(tableName);
+            if (tableMeta.getIndexes() != null && !tableMeta.getIndexes().isEmpty()) {
+                String indexedColumn = tableMeta.getIndexes().keySet().iterator().next();
+                String indexDir = dbManager.getDiskManager().getCurrentDir() + "/" + tableName;
+                String indexFile = indexDir + "/index_" + indexedColumn + ".json";
+                return new InMemoryIndexScanOperator(
+                        new edu.sustech.cs307.index.InMemoryOrderedIndex(indexFile),
+                        tableName, dbManager);
+            }
+        } catch (DBException e) {
+            // fall through
+        }
+        return new SeqScanOperator(tableName, dbManager);
     }
 
     private static PhysicalOperator handleFilter(DBManager dbManager, LogicalFilterOperator logicalFilterOp)
@@ -194,12 +218,9 @@ public class PhysicalPlanner {
 
 
     private static PhysicalOperator handleUpdate(DBManager dbManager, LogicalUpdateOperator logicalUpdateOp) throws DBException {
-        // TODO: Implement handleUpdate
         PhysicalOperator scanner = generateOperator(dbManager, logicalUpdateOp.getChild());
-        if (logicalUpdateOp.getColumns().size() != 1 ) {
-            throw new DBException(ExceptionTypes.InvalidSQL("INSERT", "Unsupported expression list"));
-        }
-        return new UpdateOperator(scanner, logicalUpdateOp.getTableName(), logicalUpdateOp.getColumns().get(0), logicalUpdateOp.getExpression());
+        return new UpdateOperator(scanner, logicalUpdateOp.getTableName(),
+                logicalUpdateOp.getColumns(), logicalUpdateOp.getExpression());
     }
     /// /////
     private static PhysicalOperator handleDelete(DBManager dbManager, LogicalDeleteOperator logicalDeleteOp)
@@ -207,12 +228,19 @@ public class PhysicalPlanner {
         PhysicalOperator childOp = generateOperator(dbManager, logicalDeleteOp.getChild());
         return new DeleteOperator(childOp, logicalDeleteOp.getTableName(), dbManager);
     }
-    /// /////
-    /// /////
-    private static PhysicalOperator handleAggregation(DBManager dbManager, LogicalAggregationOperator logicalAggOp)
+
+    private static PhysicalOperator handleAggregate(DBManager dbManager,
+                                                     LogicalAggregateOperator logicalAggOp)
             throws DBException {
         PhysicalOperator childOp = generateOperator(dbManager, logicalAggOp.getChild());
-        return new CountOperator(childOp, logicalAggOp.getFunctionName());
+        return new AggregateOperator(childOp, logicalAggOp.getGroupByColumns(),
+                logicalAggOp.getSelectItems());
     }
-    /// /////
+
+    private static PhysicalOperator handleSort(DBManager dbManager,
+                                               LogicalSortOperator logicalSortOp)
+            throws DBException {
+        PhysicalOperator childOp = generateOperator(dbManager, logicalSortOp.getChild());
+        return new SortOperator(childOp, logicalSortOp.getOrderByElements());
+    }
 }

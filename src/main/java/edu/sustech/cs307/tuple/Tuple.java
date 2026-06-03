@@ -63,9 +63,6 @@ public abstract class Tuple {
                     table_name = tableTuple.getTableName();
                 }
                 leftValue = tuple.getValue(new TabCol(table_name, leftColumn.getColumnName()));
-                if (leftValue.type == ValueType.CHAR) {
-                    leftValue = new Value(leftValue.toString());
-                }
             } else {
                 leftValue = getConstantValue(leftExpr); // Handle constant left value
             }

@@ -3,6 +3,9 @@ package edu.sustech.cs307.logicalOperator;
 import edu.sustech.cs307.exception.DBException;
 import edu.sustech.cs307.exception.ExceptionTypes;
 import edu.sustech.cs307.meta.TabCol;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -29,23 +32,33 @@ public class LogicalProjectOperator extends LogicalOperator {
     public List<TabCol> getOutputSchema() throws DBException {
         List<TabCol> outputSchema = new ArrayList<>();
         for (SelectItem<?> selectItem : selectItems) {
-            //todo : add selectItem.getExpression() instance of Column
             if (selectItem.getExpression() instanceof AllColumns column) {
                 outputSchema.add(new TabCol("*", "*"));
-            }
-            /// ////////
-            else if (selectItem.getExpression() instanceof Column column) {
+            } else if (selectItem.getExpression() instanceof Column column) {
                 String colName = column.getColumnName();
-                // If there's a table prefix (like 't' in 't.id'), extract it; otherwise default to empty or "*"
                 String tableName = (column.getTable() != null) ? column.getTable().getName() : "*";
                 outputSchema.add(new TabCol(tableName, colName));
-            }
-            /// ////////
-            else {
+            } else if (selectItem.getExpression() instanceof Function func) {
+                String displayName = func.getName().toUpperCase() + "("
+                        + getParamColumnName(func) + ")";
+                outputSchema.add(new TabCol("*", displayName));
+            } else {
                 throw new DBException(ExceptionTypes.NotSupportedOperation(selectItem.getExpression()));
             }
         }
         return outputSchema;
+    }
+
+    @SuppressWarnings("deprecation")
+    private String getParamColumnName(Function func) {
+        ExpressionList<?> params = func.getParameters();
+        if (params != null && !params.getExpressions().isEmpty()) {
+            Expression param = params.getExpressions().get(0);
+            if (param instanceof Column col) {
+                return col.getColumnName();
+            }
+        }
+        return "*";
     }
 
     @Override

@@ -182,8 +182,24 @@ public class DBManager {
         transactionManager.begin();
     }
 
-    public void commitTransaction() throws DBException{
+    public void commitTransaction() throws DBException {
         transactionManager.commit();
+    }
+
+    public void rollbackTransaction() throws DBException {
+        transactionManager.rollback();
+    }
+
+    public void savepoint(String name) throws DBException {
+        transactionManager.savepoint(name);
+    }
+
+    public void rollbackToSavepoint(String name) throws DBException {
+        transactionManager.rollbackToSavepoint(name);
+    }
+
+    public void releaseSavepoint(String name) throws DBException {
+        transactionManager.releaseSavepoint(name);
     }
 
     public void persistRuntimeState() throws DBException {

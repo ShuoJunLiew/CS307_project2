@@ -24,20 +24,20 @@ import net.sf.jsqlparser.statement.update.UpdateSet;
 public class UpdateOperator implements PhysicalOperator {
     private final SeqScanOperator seqScanOperator;
     private final String tableName;
-    private final UpdateSet updateSet;
+    private final List<UpdateSet> updateSets;
     private final Expression whereExpr;
 
     private int updateCount;
     private boolean isDone;
 
-    public UpdateOperator(PhysicalOperator inputOperator, String tableName, UpdateSet updateSet,
+    public UpdateOperator(PhysicalOperator inputOperator, String tableName, List<UpdateSet> updateSets,
                           Expression whereExpr) {
         if (!(inputOperator instanceof SeqScanOperator seqScanOperator)) {
             throw new RuntimeException("The delete operator only accepts SeqScanOperator as input");
         }
         this.seqScanOperator = seqScanOperator;
         this.tableName = tableName;
-        this.updateSet = updateSet;
+        this.updateSets = updateSets;
         this.whereExpr = whereExpr;
         this.updateCount = 0;
         this.isDone = false;
@@ -62,23 +62,25 @@ public class UpdateOperator implements PhysicalOperator {
                 List<Value> newValues = new ArrayList<>(Arrays.asList(oldValues));
                 TabCol[] schema = tuple.getTupleSchema();
 
-                for (int i = 0; i < this.updateSet.getColumns().size(); i++) {
-                    String targetTable = updateSet.getColumn(i).getTableName();
-                    if (targetTable == null) targetTable = tuple.getTableName();
-                    String targetColumn = updateSet.getColumn(i).getColumnName();
-                    int index = -1;
-                    for (int j = 0; j < schema.length; j++) {
-                        if (schema[j].getColumnName().equalsIgnoreCase(targetColumn)
-                                && schema[j].getTableName().equalsIgnoreCase(targetTable)) {
-                            index = j;
-                            break;
+                for (UpdateSet updateSet : updateSets) {
+                    for (int i = 0; i < updateSet.getColumns().size(); i++) {
+                        String targetTable = updateSet.getColumn(i).getTableName();
+                        if (targetTable == null) targetTable = tuple.getTableName();
+                        String targetColumn = updateSet.getColumn(i).getColumnName();
+                        int index = -1;
+                        for (int j = 0; j < schema.length; j++) {
+                            if (schema[j].getColumnName().equalsIgnoreCase(targetColumn)
+                                    && schema[j].getTableName().equalsIgnoreCase(targetTable)) {
+                                index = j;
+                                break;
+                            }
                         }
+                        if (index == -1) {
+                            throw new DBException(ExceptionTypes.ColumnDoesNotExist(targetColumn));
+                        }
+                        Value newValue = tuple.evaluateExpression(updateSet.getValue(i));
+                        newValues.set(index, newValue);
                     }
-                    if (index == -1) {
-                        throw new DBException(ExceptionTypes.ColumnDoesNotExist(targetColumn));
-                    }
-                    Value newValue = tuple.evaluateExpression(updateSet.getValue(i));
-                    newValues.set(index, newValue);
                 }
                 ByteBuf buffer = Unpooled.buffer();
                 for (Value v : newValues) {

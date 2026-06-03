@@ -21,7 +21,12 @@ public enum ExceptionTypes {
     INSERT_COLUMN_NAME_NOT_MATCH,
     INSERT_COLUMN_TYPE_NOT_MATCH,
     GET_VALUE_FROM_TEMP_TUPLE,
-    NOT_SUPPORTED_OPERATION
+    NOT_SUPPORTED_OPERATION,
+    INDEX_ALREADY_EXIST,
+    INDEX_DOES_NOT_EXIST,
+    TRANSACTION_ALREADY_ACTIVE,
+    TRANSACTION_REQUIRED,
+    SAVEPOINT_DOES_NOT_EXIST
     ;
 
     private String error_result;
@@ -154,5 +159,35 @@ public enum ExceptionTypes {
                 String.format("Unsupported operation: %s", expression)
         );
         return NOT_SUPPORTED_OPERATION;
+    }
+
+    static public ExceptionTypes IndexAlreadyExist(String tableName, String columnName) {
+        INDEX_ALREADY_EXIST.SetErrorResult(
+                String.format("Index already exists on table %s column %s", tableName, columnName));
+        return INDEX_ALREADY_EXIST;
+    }
+
+    static public ExceptionTypes IndexDoesNotExist(String tableName, String columnName) {
+        INDEX_DOES_NOT_EXIST.SetErrorResult(
+                String.format("Index does not exist on table %s column %s", tableName, columnName));
+        return INDEX_DOES_NOT_EXIST;
+    }
+
+    static public ExceptionTypes TransactionAlreadyActive() {
+        TRANSACTION_ALREADY_ACTIVE.SetErrorResult(
+                "TRANSACTION_ALREADY_ACTIVE: Transaction is already active");
+        return TRANSACTION_ALREADY_ACTIVE;
+    }
+
+    static public ExceptionTypes TransactionRequired() {
+        TRANSACTION_REQUIRED.SetErrorResult(
+                "TRANSACTION_REQUIRED: Operation requires an active transaction");
+        return TRANSACTION_REQUIRED;
+    }
+
+    static public ExceptionTypes SavepointDoesNotExist(String savepointName) {
+        SAVEPOINT_DOES_NOT_EXIST.SetErrorResult(
+                String.format("SAVEPOINT_DOES_NOT_EXIST: Savepoint '%s' does not exist", savepointName));
+        return SAVEPOINT_DOES_NOT_EXIST;
     }
 }
