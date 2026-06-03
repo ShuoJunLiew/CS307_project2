@@ -133,4 +133,11 @@ public class SeqScanOperator implements PhysicalOperator {
     public RecordFileHandle getFileHandle() {
         return fileHandle;
     }
+
+    /// /////
+    @Override
+    public String explain(String indent) {
+        return indent + "TableScanOperator(table=" + this.tableName + ")\n";
+    }
+    /// /////
 }

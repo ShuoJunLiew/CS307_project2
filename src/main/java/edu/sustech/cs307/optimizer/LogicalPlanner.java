@@ -271,12 +271,11 @@ public class LogicalPlanner {
             }
         }
 
-        // 在 Join 之后应用 Filter，Filter 的输入是 Join 的结果 (root)
+        // Apply filtering after joins
         if (plainSelect.getWhere() != null) {
             root = new LogicalFilterOperator(root, plainSelect.getWhere());
         }
-
-        // Handle GROUP BY and aggregate functions (MAX, MIN)
+        // Handle GROUP BY and aggregate functions (MAX, MIN, COUNT)
         boolean hasGroupBy = plainSelect.getGroupBy() != null;
         boolean hasAggregates = hasAggregateFunctions(plainSelect.getSelectItems());
 

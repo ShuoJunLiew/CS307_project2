@@ -90,6 +90,7 @@ public class AggregateOperator implements PhysicalOperator {
                     switch (funcName) {
                         case "MAX" -> resultValues.add(computeMax(group, func));
                         case "MIN" -> resultValues.add(computeMin(group, func));
+                        case "COUNT" -> resultValues.add(computeCount(group));
                         default -> throw new DBException(
                                 ExceptionTypes.NotSupportedOperation(expr));
                     }
@@ -147,6 +148,10 @@ public class AggregateOperator implements PhysicalOperator {
     }
 
     private ValueType getFunctionResultType(Function func) throws DBException {
+        // COUNT always returns INTEGER regardless of parameter type
+        if ("COUNT".equalsIgnoreCase(func.getName())) {
+            return ValueType.INTEGER;
+        }
         String paramColName = getParamColumnName(func);
         for (ColumnMeta childCol : childSchema) {
             if (childCol.name.equalsIgnoreCase(paramColName)) {
@@ -183,6 +188,10 @@ public class AggregateOperator implements PhysicalOperator {
             }
         }
         return maxVal;
+    }
+
+    private Value computeCount(List<Tuple> group) {
+        return new Value((long) group.size());
     }
 
     private Value computeMin(List<Tuple> group, Function func) throws DBException {

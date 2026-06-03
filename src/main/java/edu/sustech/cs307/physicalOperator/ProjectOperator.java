@@ -84,4 +84,28 @@ public class ProjectOperator implements PhysicalOperator {
         return columns;
         //return child.outputSchema();
     }
+
+    /// /////
+    @Override
+    public String explain(String indent) {
+        StringBuilder sb = new StringBuilder();
+
+        // 1. Convert TabCol references into readable "tableName.columnName" strings
+        java.util.List<String> fieldStrings = new ArrayList<>();
+        if (this.outputSchema != null) {
+            for (TabCol col : this.outputSchema) {
+                fieldStrings.add(col.getTableName() + "." + col.getColumnName());
+            }
+        }
+
+        // 2. Build the exact string format required by your project document
+        sb.append(indent).append("ProjectOperator(selectItems=").append(fieldStrings.toString()).append(")\n");
+
+        if (this.child != null) {
+            sb.append(this.child.explain(indent + "└── "));
+        }
+        return sb.toString();
+    }
+    /// /////
+
 }
