@@ -68,6 +68,12 @@ public class AggregateOperator implements PhysicalOperator {
             groups.computeIfAbsent(groupKey, k -> new ArrayList<>()).add(tuple);
         }
 
+        // Handle empty input: produce one empty group so aggregates return defaults
+        // (COUNT=0, MAX/MIN=null)
+        if (groups.isEmpty()) {
+            groups.put("", new ArrayList<>());
+        }
+
         // For each group, compute aggregate results
         for (List<Tuple> group : groups.values()) {
             List<Value> resultValues = new ArrayList<>();
