@@ -218,12 +218,9 @@ public class PhysicalPlanner {
 
 
     private static PhysicalOperator handleUpdate(DBManager dbManager, LogicalUpdateOperator logicalUpdateOp) throws DBException {
-        // TODO: Implement handleUpdate
         PhysicalOperator scanner = generateOperator(dbManager, logicalUpdateOp.getChild());
-        if (logicalUpdateOp.getColumns().size() != 1 ) {
-            throw new DBException(ExceptionTypes.InvalidSQL("UPDATE", "Unsupported expression list"));
-        }
-        return new UpdateOperator(scanner, logicalUpdateOp.getTableName(), logicalUpdateOp.getColumns().get(0), logicalUpdateOp.getExpression());
+        return new UpdateOperator(scanner, logicalUpdateOp.getTableName(),
+                logicalUpdateOp.getColumns(), logicalUpdateOp.getExpression());
     }
     /// /////
     private static PhysicalOperator handleDelete(DBManager dbManager, LogicalDeleteOperator logicalDeleteOp)
